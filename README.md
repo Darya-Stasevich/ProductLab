@@ -8,7 +8,7 @@
 
 2) Создаем виртуальное окружение python -m venv venv
 3) Активируем виртуальное окружение venv/Scripts/activate
-4) Устнавливаем зависимости pip install -r requirements.txt
+4) Устанавливаем зависимости pip install -r requirements.txt
 5) Выполняем миграции python manage.py makemigrations,
 python manage.py migrate
 6) Запускаем проект python manage.py runserver
