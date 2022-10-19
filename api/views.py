@@ -1,11 +1,20 @@
 import asyncio
+import json
+
 import aiohttp
 import openpyxl
+from django.http import JsonResponse, HttpResponse
 from rest_framework import mixins, viewsets
 from rest_framework.parsers import MultiPartParser, FileUploadParser
-from rest_framework.response import Response
 from api.models import Article, File
 from api.serializers import FileSerializer, ArticleSerializer
+from pydantic import BaseModel, ValidationError
+
+
+class Item(BaseModel):
+    article: int
+    brand: str
+    title: str
 
 
 class ArticleViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -17,22 +26,26 @@ class ArticleViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         article = serializer.validated_data['article']
-        dct = {}
         async def main():
             async with aiohttp.ClientSession() as session:
                 url = f'https://card.wb.ru/cards/detail?nm={str(article)}'
                 async with session.get(url) as resp:
                     data = await resp.json(content_type=None)
                     if data['data']['products']:
-                        dct['article'] = data['data']['products'][0]['id']
-                        dct['brand'] = data['data']['products'][0]['brand']
-                        dct['title'] = data['data']['products'][0]['name']
+                        art = data['data']['products'][0]['id']
+                        brand = data['data']['products'][0]['brand']
+                        title = data['data']['products'][0]['name']
+                        try:
+                            item = Item(article=art, brand=brand, title=title)
+                            return(item.dict())
+                        except ValidationError as e:
+                            e.json()
+                            return('Invalid data')
+                    else:
+                        return (f'Article {article} was not found')
 
-        asyncio.run(main())
-        if dct:
-            return Response(dct)
-        else:
-            return Response(f'Товар c артикулом {article} не найден')
+        res = asyncio.run(main())
+        return HttpResponse(json.dumps(res, ensure_ascii=False))
 
 
 class FileUploadViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -57,11 +70,17 @@ class FileUploadViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
                     async with session.get(url) as resp:
                         data = await resp.json(content_type=None)
                         if data['data']['products']:
-                            article = data['data']['products'][0]['id']
+                            art = data['data']['products'][0]['id']
                             brand = data['data']['products'][0]['brand']
-                            title = data['data']['products'][0]['name']
-                            dct = {'article': article, 'brand': brand, 'title': title}
-                            goods.append(dct)
+                            title = (data['data']['products'][0]['name'])
+                            try:
+                                item = Item(article=art, brand=brand, title=title)
+                                goods.append(item.dict())
+                            except ValidationError as e:
+                                e.json()
 
         asyncio.run(main())
-        return Response(goods)
+        if goods:
+            return HttpResponse(json.dumps(goods, ensure_ascii=False))
+        else:
+            return JsonResponse('Goods are not found', safe=False)
