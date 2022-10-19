@@ -13,5 +13,5 @@
 python manage.py migrate
 6) Запускаем проект python manage.py runserver
 7) Переходим на локальный сервер http://127.0.0.1:8000/
-8) Переходим на нужный endpoint "http://127.0.0.1:8000/get_articles_list/" (API принимающее один артикул)
+8) Переходим на нужный endpoint "http://127.0.0.1:8000/get_article/" (API принимающее один артикул)
 либо "http://127.0.0.1:8000/get_articles_list/" (API принимающее файл формата xlsx)
