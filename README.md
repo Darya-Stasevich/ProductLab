@@ -1,7 +1,7 @@
-# ProductLab
-Стасевич Дарья Викторовна
+# ProductLab Стасевич Дарья Викторовна
 
 1) Клонируем проект https://github.com/Darya-Stasevich/ProductLab.git
+
 Задание №1 Запустить питоновский файлик test1.py
 
 Задание №2 (для Windows)
