@@ -26,6 +26,7 @@ class ArticleViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         article = serializer.validated_data['article']
+        self.perform_create(serializer)
         async def main():
             async with aiohttp.ClientSession() as session:
                 url = f'https://card.wb.ru/cards/detail?nm={str(article)}'
