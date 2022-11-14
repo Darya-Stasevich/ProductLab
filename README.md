@@ -1,4 +1,4 @@
-# ProductLab Стасевич Дарья Викторовна
+Стасевич Дарья Викторовна
 
 1) Клонируем проект https://github.com/Darya-Stasevich/ProductLab.git
 
